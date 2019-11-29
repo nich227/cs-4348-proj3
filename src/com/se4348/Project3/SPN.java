@@ -1,5 +1,5 @@
 /** 
- * FCFS.java
+ * SPN.java
  * 
  * @author Ning Kevin Chen
  * NetID: nkc160130
@@ -11,8 +11,9 @@ package com.se4348.Project3;
 
 import java.util.ArrayList;
 
-public class FCFS extends SchedulingAlg {
-	public FCFS(ArrayList<JobTuple> j) {
+public class SPN extends SchedulingAlg {
+
+	public SPN(ArrayList<JobTuple> j) {
 		super(j);
 	}
 
@@ -22,24 +23,24 @@ public class FCFS extends SchedulingAlg {
 		for (JobTuple job : jobs) {
 			remaining_jobs.add(job);
 		}
+		int cur_time = 0;
 
 		// Iterate until all jobs have been visited
 		int cur_node = 0;
 		while (!remaining_jobs.isEmpty()) {
 
-			// Check node with lowest start time
+			// Check node with lowest expected runtime (given it's already started)
 			int min = Integer.MAX_VALUE;
 			int min_node = 0;
-			int i = 0;
 			for (JobTuple node : remaining_jobs) {
-				if (node.getStartTime() < min)
-					min = node.getStartTime();
-				i++;
+				if (node.getDuration() < min && cur_time >= node.getStartTime()) {
+					min = node.getDuration();
+				}
 			}
 			ArrayList<Integer> min_nodes = new ArrayList<>();
-			i = 0;
+			int i = 0;
 			for (JobTuple node : remaining_jobs) {
-				if (node.getStartTime() == min)
+				if (node.getDuration() == min && cur_time >= node.getStartTime())
 					min_nodes.add(i);
 				i++;
 			}
@@ -57,7 +58,6 @@ public class FCFS extends SchedulingAlg {
 				}
 				min_node = index_letter;
 			}
-
 			cur_node = min_node;
 
 			// Iterate until job finished
@@ -75,6 +75,7 @@ public class FCFS extends SchedulingAlg {
 
 				run_matrix.add(time_frame_vals);
 				remaining_jobs.get(cur_node).setDuration(remaining_jobs.get(cur_node).getDuration() - 1);
+				cur_time++;
 			}
 
 			// Remove current node from list of remaining jobs to run
@@ -86,4 +87,5 @@ public class FCFS extends SchedulingAlg {
 			job.resetDuration();
 		}
 	}
+
 }

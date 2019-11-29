@@ -1,6 +1,9 @@
 button {
   width: 100%;
 }
+.job-inactive {
+  border-radius: 0px;
+}
 table {
   width: 100%;
   table-layout: fixed;
@@ -33,6 +36,8 @@ body {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 }
-.job_col {
-  background-color: #EDF5E1;
+th.job-col {
+  background-color: #c2cad0;
+  text-align: center !important;
+  color: black;
 }

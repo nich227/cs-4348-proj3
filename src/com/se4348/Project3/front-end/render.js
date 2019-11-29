@@ -1,3 +1,12 @@
+/** 
+ * render.js
+ * 
+ * Author: Ning Kevin Chen
+ * NetID: nkc160130
+ * Coded in: JavaScript
+ * Class: SE 4348
+ * Professor: Greg Ozbirn
+ */
 function renderGraph(arr, job_ids, alg, hide_graph) {
   if (hide_graph) {
     // Add tab to webpage (inactive)
@@ -8,6 +17,7 @@ function renderGraph(arr, job_ids, alg, hide_graph) {
       "<li id='tab" + alg + "' class='is-active'><a>" + alg + "</a></li>"
     );
   }
+  $("#tab" + alg).attr("onclick", "onTabClick('" + alg + "');");
 
   let colour = "";
 
@@ -35,16 +45,17 @@ function renderGraph(arr, job_ids, alg, hide_graph) {
       colour = "black";
       break;
   }
-  
+
   //Adding a table to the interface
   $("body").append(
     $("#tableTmpl")
+      .clone()
       .attr("id", "table" + alg)
       .show()
   );
 
   //Initializing columns
-  $("#table" + alg + " > thead > tr").append("<th class='job_col'>Job</th>");
+  $("#table" + alg + " > thead > tr").append("<th class='job-col'>Job</th>");
   for (let i = 0; i <= arr.length; i++) {
     $("#table" + alg + " > thead > tr").append(
       "<th class='time-intervals'>" + i + "</th>"
@@ -57,16 +68,17 @@ function renderGraph(arr, job_ids, alg, hide_graph) {
   for (let i = 0; i < job_ids.length; i++) {
     let j = 0;
     let duration = 0;
-    
-    $("#table" + alg + " > tbody").append("<tr id='" + alg + job_ids[i] + "'></tr>");
+
+    $("#table" + alg + " > tbody").append(
+      "<tr id='" + alg + job_ids[i] + "'></tr>"
+    );
 
     $("#table" + alg + " > tbody > #" + alg + job_ids[i]).append(
-      "<th class='job_col'>" + job_ids[i] + "</th>"
+      "<th class='job-col'>" + job_ids[i] + "</th>"
     );
 
     // Iterating through all the time slots
     while (j < arr.length) {
-      
       // Color (job is running)
       if (j < arr.length && arr[j][i] === true) {
         while (j < arr.length && arr[j][i] === true) {
@@ -99,7 +111,7 @@ function renderGraph(arr, job_ids, alg, hide_graph) {
           "<td colspan='" +
             duration +
             "'>" +
-            "<button class='button is-white has-tooltip-light' data-tooltip='Duration: " +
+            "<button class='button is-white has-tooltip-light job-inactive' data-tooltip='Duration: " +
             duration +
             "'></button>" +
             "</td>"
