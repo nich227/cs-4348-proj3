@@ -29,36 +29,28 @@ public class FCFS extends SchedulingAlg {
 
 			// Check node with lowest start time
 			int min = Integer.MAX_VALUE;
-			int min_node = 0;
 			int i = 0;
+			ArrayList<Integer> jobs_starting_now = new ArrayList<>();
 			for (JobTuple node : remaining_jobs) {
-				if (node.getStartTime() < min)
+				if (node.getStartTime() < min) {
 					min = node.getStartTime();
-				i++;
-			}
-			ArrayList<Integer> min_nodes = new ArrayList<>();
-			i = 0;
-			for (JobTuple node : remaining_jobs) {
-				if (node.getStartTime() == min)
-					min_nodes.add(i);
-				i++;
-			}
-			if (min_nodes.size() == 1) {
-				min_node = min_nodes.get(0);
-			} else if (min_nodes.size() > 1) {
-				char lowest_letter = (char) 127;
-				int index_letter = 0;
-				for (Integer node : min_nodes) {
-					if (remaining_jobs.get(node).getJobId().charAt(0) < lowest_letter) {
-						lowest_letter = remaining_jobs.get(node).getJobId().charAt(0);
-						index_letter = node.intValue();
-					}
-
 				}
-				min_node = index_letter;
+				i++;
 			}
-
-			cur_node = min_node;
+			i = 0;
+			for (JobTuple job : remaining_jobs) {
+				if (job.getStartTime() == min) {
+					jobs_starting_now.add(i);
+				}
+				i++;
+			}
+			cur_node = jobs_starting_now.get(0);
+			jobs_starting_now.remove(0);
+			if (!jobs_starting_now.isEmpty()) {
+				for (Integer job : jobs_starting_now) {
+					remaining_jobs.get(job).setStartTime(remaining_jobs.get(job).getStartTime() + 1);
+				}
+			}
 
 			// Iterate until job finished
 			while (remaining_jobs.get(cur_node).getDuration() > 0) {
@@ -84,6 +76,7 @@ public class FCFS extends SchedulingAlg {
 		// Reset durations for each tuple back to original
 		for (JobTuple job : jobs) {
 			job.resetDuration();
+			job.resetStartTime();
 		}
 	}
 }

@@ -24,3 +24,6 @@ NOTE 2:	If you want to change the jobs.txt, please do so with the one located in
 NOTE 3: I have also included a proj3.jar, for your convenience. To run, type:
 		java -jar proj3.jar <algorithm>
 	The jobs.txt must be in the same folder as this jar file.
+
+NOTE 4: If you're running on Linux, use the official Oracle Java implementation, 
+	and not open-source alternatives. 

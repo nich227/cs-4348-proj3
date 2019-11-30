@@ -38,24 +38,10 @@ public class FB extends SchedulingAlg {
 					acc_time.acquire();
 				} catch (InterruptedException e) {
 				}
-				ArrayList<JobTuple> jobs_added = new ArrayList<>();
 				for (JobTuple job : jobs) {
 					if (job.getStartTime() == cur_time && !fbq.get(0).contains(job)) {
-						jobs_added.add(job);
+						fbq.get(0).add(job);
 					}
-				}
-				if (jobs_added.size() == 1) {
-					fbq.get(0).add(jobs_added.get(0));
-				} else if (jobs_added.size() > 1) {
-					char lowest_letter = (char) 127;
-					JobTuple lowest_node = null;
-					for (JobTuple job : jobs_added) {
-						if (remaining_jobs.get(remaining_jobs.indexOf(job)).getJobId().charAt(0) < lowest_letter) {
-							lowest_letter = remaining_jobs.get(remaining_jobs.indexOf(job)).getJobId().charAt(0);
-							lowest_node = job;
-						}
-					}
-					fbq.get(0).add(lowest_node);
 				}
 
 				acc_time.release();
@@ -121,10 +107,8 @@ public class FB extends SchedulingAlg {
 					num_queue_run = i;
 					break;
 				}
-			}
 
-			if(num_queue_run == -1)
-				break;
+			}
 
 			// Run current top job in CPU
 			cpu = fbq.get(num_queue_run).remove();
@@ -203,4 +187,3 @@ public class FB extends SchedulingAlg {
 	}
 
 }
-

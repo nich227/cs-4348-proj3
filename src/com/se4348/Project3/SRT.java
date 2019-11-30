@@ -22,8 +22,7 @@ public class SRT extends SchedulingAlg {
 
 			// Check node with lowest expected runtime (given it's already started)
 			int min = Integer.MAX_VALUE;
-			int min_node = -1;
-			ArrayList<JobTuple> min_nodes = new ArrayList<>();
+			ArrayList<Integer> jobs_starting_now = new ArrayList<>();
 			int i = 0;
 			for (JobTuple node : remaining_jobs) {
 				if (node.getDuration() < min && cur_time >= node.getStartTime()) {
@@ -31,42 +30,48 @@ public class SRT extends SchedulingAlg {
 				}
 				i++;
 			}
+			i = 0;
 			for (JobTuple node : remaining_jobs) {
 				if (node.getDuration() == min && cur_time >= node.getStartTime()) {
-					min_nodes.add(node);
+					jobs_starting_now.add(i);
+				}
+				i++;
+			}
+			cur_node = jobs_starting_now.get(0);
+			jobs_starting_now.remove(0);
+			if (!jobs_starting_now.isEmpty()) {
+				for (Integer job : jobs_starting_now) {
+					remaining_jobs.get(job).setStartTime(remaining_jobs.get(job).getStartTime() + 1);
 				}
 			}
-			if (min_nodes.size() == 1) {
-				min_node = remaining_jobs.indexOf(min_nodes.get(0));
-			} else if (min_nodes.size() > 1) {
-				char lowest_letter = (char) 127;
-				JobTuple lowest_node = null;
-				for (JobTuple node : min_nodes) {
-					if (remaining_jobs.get(remaining_jobs.indexOf(node)).getJobId().charAt(0) < lowest_letter) {
-						lowest_letter = remaining_jobs.get(remaining_jobs.indexOf(node)).getJobId().charAt(0);
-						lowest_node = node;
-					}
-				}
-				min_node = remaining_jobs.indexOf(lowest_node);
-			}
-
-			cur_node = min_node;
 
 			// Iterate until job finished (preemptive though and will interrupt if shorter
 			// process found)
 			while (remaining_jobs.get(cur_node).getDuration() > 0) {
 				// Check node with lowest expected runtime (given it's already started)
 				min = Integer.MAX_VALUE;
-				min_node = 0;
+				jobs_starting_now = new ArrayList<>();
 				i = 0;
 				for (JobTuple node : remaining_jobs) {
 					if (node.getDuration() < min && cur_time >= node.getStartTime()) {
 						min = node.getDuration();
-						min_node = i;
 					}
 					i++;
 				}
-				cur_node = min_node;
+				i = 0;
+				for (JobTuple node : remaining_jobs) {
+					if (node.getDuration() == min && cur_time >= node.getStartTime()) {
+						jobs_starting_now.add(i);
+					}
+					i++;
+				}
+				cur_node = jobs_starting_now.get(0);
+				jobs_starting_now.remove(0);
+				if (!jobs_starting_now.isEmpty()) {
+					for (Integer job : jobs_starting_now) {
+						remaining_jobs.get(job).setStartTime(remaining_jobs.get(job).getStartTime() + 1);
+					}
+				}
 
 				// Make array of running jobs at this time frame
 				boolean[] time_frame_vals = new boolean[jobs.size()];
@@ -91,6 +96,7 @@ public class SRT extends SchedulingAlg {
 		// Reset durations for each tuple back to original
 		for (JobTuple job : jobs) {
 			job.resetDuration();
+			job.resetStartTime();
 		}
 
 	}

@@ -31,34 +31,28 @@ public class SPN extends SchedulingAlg {
 
 			// Check node with lowest expected runtime (given it's already started)
 			int min = Integer.MAX_VALUE;
-			int min_node = 0;
+			ArrayList<Integer> jobs_starting_now = new ArrayList<>();
+			int i = 0;
 			for (JobTuple node : remaining_jobs) {
 				if (node.getDuration() < min && cur_time >= node.getStartTime()) {
 					min = node.getDuration();
 				}
-			}
-			ArrayList<Integer> min_nodes = new ArrayList<>();
-			int i = 0;
-			for (JobTuple node : remaining_jobs) {
-				if (node.getDuration() == min && cur_time >= node.getStartTime())
-					min_nodes.add(i);
 				i++;
 			}
-			if (min_nodes.size() == 1) {
-				min_node = min_nodes.get(0);
-			} else if (min_nodes.size() > 1) {
-				char lowest_letter = (char) 127;
-				int index_letter = 0;
-				for (Integer node : min_nodes) {
-					if (remaining_jobs.get(node).getJobId().charAt(0) < lowest_letter) {
-						lowest_letter = remaining_jobs.get(node).getJobId().charAt(0);
-						index_letter = node.intValue();
-					}
-
+			i = 0;
+			for (JobTuple node : remaining_jobs) {
+				if (node.getDuration() == min && cur_time >= node.getStartTime()) {
+					jobs_starting_now.add(i);
 				}
-				min_node = index_letter;
+				i++;
 			}
-			cur_node = min_node;
+			cur_node = jobs_starting_now.get(0);
+			jobs_starting_now.remove(0);
+			if (!jobs_starting_now.isEmpty()) {
+				for (Integer job : jobs_starting_now) {
+					remaining_jobs.get(job).setStartTime(remaining_jobs.get(job).getStartTime() + 1);
+				}
+			}
 
 			// Iterate until job finished
 			while (remaining_jobs.get(cur_node).getDuration() > 0) {

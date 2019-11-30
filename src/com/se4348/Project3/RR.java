@@ -24,7 +24,6 @@ public class RR extends SchedulingAlg {
 	public void run() {
 		Queue<JobTuple> readyQueue = new LinkedList<>();
 		int cur_time = 0;
-		boolean has_a_job_started = false;
 		ArrayList<JobTuple> remaining_jobs = new ArrayList<JobTuple>();
 		for (JobTuple job : jobs) {
 			remaining_jobs.add(job);
@@ -35,41 +34,15 @@ public class RR extends SchedulingAlg {
 		while (!remaining_jobs.isEmpty()) {
 
 			// Find any jobs that should be starting at this time
-			ArrayList<JobTuple> jobs_added = new ArrayList<>();
 			for (JobTuple job : jobs) {
 				if (job.getStartTime() == cur_time) {
-					jobs_added.add(job);
-					has_a_job_started = true;
+					readyQueue.add(job);
 				}
-			}
-			if (jobs_added.size() == 1) {
-				readyQueue.add(jobs_added.get(0));
-			} else if (jobs_added.size() > 1) {
-				char lowest_letter = (char) 127;
-				JobTuple lowest_node = null;
-				for (JobTuple node : jobs_added) {
-					if (remaining_jobs.get(remaining_jobs.indexOf(node)).getJobId().charAt(0) < lowest_letter) {
-						lowest_letter = remaining_jobs.get(remaining_jobs.indexOf(node)).getJobId().charAt(0);
-						lowest_node = node;
-					}
-
-				}
-				readyQueue.add(lowest_node);
 			}
 
 			// Put previous job at the bottom of the queue (if it's still running)
 			if (remaining_jobs.contains(cpu))
 				readyQueue.add(cpu);
-
-			// Ready queue is empty and there has already been a job started
-			if (readyQueue.isEmpty() && has_a_job_started) {
-				break;
-			}
-			// Ready queue is empty and there has not already been a job started
-			if (readyQueue.isEmpty() && !has_a_job_started) {
-				cur_time++;
-				continue;
-			}
 
 			// Run the top of the queue
 			cpu = readyQueue.remove();

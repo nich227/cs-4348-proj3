@@ -67,8 +67,7 @@ public class HRRN extends SchedulingAlg {
 
 			// Choose max response ratio
 			double max_val = Double.MIN_VALUE;
-			int max_node = -1;
-			ArrayList<Integer> max_nodes = new ArrayList<Integer>();
+			ArrayList<Integer> jobs_starting_now = new ArrayList<>();
 			for (int k = 0; k < remaining_jobs.size(); k++) {
 				int wait_time = cur_time - remaining_jobs.get(k).getStartTime();
 				double rr = (wait_time + remaining_jobs.get(k).getDuration())
@@ -82,27 +81,20 @@ public class HRRN extends SchedulingAlg {
 				double rr = (wait_time + remaining_jobs.get(k).getDuration())
 						/ (remaining_jobs.get(k).getDuration() / 1.0);
 				if (rr == max_val && cur_time >= remaining_jobs.get(k).getStartTime()) {
-					max_nodes.add(k);
+					jobs_starting_now.add(k);
 				}
 			}
-			// There is not a tie
-			if (max_nodes.size() == 1) {
-				max_node = max_nodes.get(0);
-			}
-			// There is at least one tie
-			else if (max_nodes.size() > 1) {
-				char lowest_letter = (char) 127;
-				int max_node_loc = -1;
-				for (Integer mn : max_nodes) {
-					if (remaining_jobs.get(mn).getJobId().charAt(0) < lowest_letter) {
-						lowest_letter = remaining_jobs.get(mn).getJobId().charAt(0);
-						max_node_loc = mn;
+			cur_node = jobs_starting_now.get(0);
+			jobs_starting_now.remove(0);
+			if (!jobs_starting_now.isEmpty()) {
+				// Some jobs that start at the same time must now start later
+				if (!jobs_starting_now.isEmpty()) {
+					for (int j = 1; j < jobs_starting_now.size(); j++) {
+						remaining_jobs.get(jobs_starting_now.get(j))
+								.setStartTime(remaining_jobs.get(jobs_starting_now.get(j)).getStartTime() + 1);
 					}
 				}
-				max_node = max_nodes.get(max_node_loc);
 			}
-
-			cur_node = max_node;
 
 			// Run the job
 			while (remaining_jobs.get(cur_node).getDuration() > 0) {
@@ -127,7 +119,9 @@ public class HRRN extends SchedulingAlg {
 		}
 
 		// Reset durations for each tuple back to original
-		for (JobTuple job : jobs) {
+		for (
+
+		JobTuple job : jobs) {
 			job.resetDuration();
 		}
 	}
