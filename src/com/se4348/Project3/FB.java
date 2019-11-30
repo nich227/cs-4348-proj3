@@ -123,6 +123,9 @@ public class FB extends SchedulingAlg {
 				}
 			}
 
+			if(num_queue_run == -1)
+				break;
+
 			// Run current top job in CPU
 			cpu = fbq.get(num_queue_run).remove();
 			acc_queue.release();
@@ -200,3 +203,4 @@ public class FB extends SchedulingAlg {
 	}
 
 }
+
